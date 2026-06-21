@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
@@ -521,6 +521,39 @@
       color: var(--muted);
       line-height: 1.45;
       font-size: 13px;
+    }
+
+    .premium-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .premium-status {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .locked-panel {
+      border: 1px dashed rgba(138, 101, 24, .45);
+      border-radius: 8px;
+      background: #fffaf0;
+      color: #5d4512;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      line-height: 1.45;
+    }
+
+    .locked-panel b {
+      color: #3f2d09;
+    }
+
+    .premium-disabled {
+      opacity: .58;
+      pointer-events: none;
     }
 
     .kpi {
@@ -1079,7 +1112,7 @@
 
         <article class="panel inner">
           <div class="history-head">
-            <h2 class="eyebrow">Últimos 10 jogos</h2>
+            <h2 class="eyebrow">?ltimos 10 jogos</h2>
             <span class="tag" id="teamHistorySource">Clique em uma seleção</span>
           </div>
           <div class="history-title" id="teamHistoryTitle">
@@ -1147,7 +1180,7 @@
             <div><b>Ratings por partida futura:</b> World Football Elo Ratings `fixtures.tsv`, baixado em 21/06/2026. Quando o rating pré-jogo não existe para uma partida já concluída, a página usa o melhor rating recente disponível para aquela seleção.</div>
             <div><b>Precisão do modelo:</b> quando há odds embutidas, a probabilidade final combina 65% Elo/Poisson com 35% mercado. Sem odds, a leitura usa Elo, ataque/defesa, forma no grupo e gols esperados.</div>
             <div><b>Tabelas:</b> pontos, vitórias, empates, derrotas, saldo e gols são recalculados automaticamente a partir dos resultados reais carregados no calendário.</div>
-            <div><b>Mata-mata:</b> os jogos aparecem como “a definir” porque os classificados ainda não estão completos. A interface já está pronta para receber esses confrontos.</div>
+            <div><b>Mata-mata:</b> os jogos aparecem como ?a definir? porque os classificados ainda não estão completos. A interface já está pronta para receber esses confrontos.</div>
             <div>Links: <a href="https://www.sbnation.com/soccer/1117513/world-cup-schedule-2026-how-to-watch-every-match-scores-and-more" target="_blank" rel="noreferrer">calendário/resultados</a>, <a href="https://www.eloratings.net/2026_World_Cup" target="_blank" rel="noreferrer">World Football Elo</a>, <a href="https://www.theguardian.com/football/live/2026/jun/20/ecuador-v-curacao-world-cup-2026-live" target="_blank" rel="noreferrer">Ecuador 0-0 Curaçao</a>.</div>
           </div>
         </article>
@@ -1180,15 +1213,15 @@
     };
 
     const FLAGS = {
-      "Algeria":"🇩🇿", "Argentina":"🇦🇷", "Australia":"🇦🇺", "Austria":"🇦🇹", "Belgium":"🇧🇪",
-      "Bosnia and Herzegovina":"🇧🇦", "Brazil":"🇧🇷", "Canada":"🇨🇦", "Cape Verde":"🇨🇻", "Colombia":"🇨🇴",
-      "Croatia":"🇭🇷", "Curaçao":"🇨🇼", "Czechia":"🇨🇿", "DR Congo":"🇨🇩", "Ecuador":"🇪🇨", "Egypt":"🇪🇬",
-      "England":"🏴", "France":"🇫🇷", "Germany":"🇩🇪", "Ghana":"🇬🇭", "Haiti":"🇭🇹", "Iran":"🇮🇷",
-      "Iraq":"🇮🇶", "Ivory Coast":"🇨🇮", "Japan":"🇯🇵", "Jordan":"🇯🇴", "Mexico":"🇲🇽", "Morocco":"🇲🇦",
-      "Netherlands":"🇳🇱", "New Zealand":"🇳🇿", "Norway":"🇳🇴", "Panama":"🇵🇦", "Paraguay":"🇵🇾",
-      "Portugal":"🇵🇹", "Qatar":"🇶🇦", "Saudi Arabia":"🇸🇦", "Scotland":"🏴", "Senegal":"🇸🇳",
-      "South Africa":"🇿🇦", "South Korea":"🇰🇷", "Spain":"🇪🇸", "Sweden":"🇸🇪", "Switzerland":"🇨🇭",
-      "Tunisia":"🇹🇳", "Turkey":"🇹🇷", "Uruguay":"🇺🇾", "United States":"🇺🇸", "Uzbekistan":"🇺🇿"
+      "Algeria":"ðŸ‡©ðŸ‡¿", "Argentina":"ðŸ‡¦ðŸ‡·", "Australia":"ðŸ‡¦ðŸ‡º", "Austria":"ðŸ‡¦ðŸ‡¹", "Belgium":"ðŸ‡§ðŸ‡ª",
+      "Bosnia and Herzegovina":"ðŸ‡§ðŸ‡¦", "Brazil":"ðŸ‡§ðŸ‡·", "Canada":"ðŸ‡¨ðŸ‡¦", "Cape Verde":"ðŸ‡¨ðŸ‡»", "Colombia":"ðŸ‡¨ðŸ‡´",
+      "Croatia":"ðŸ‡­ðŸ‡·", "Curaçao":"ðŸ‡¨ðŸ‡¼", "Czechia":"ðŸ‡¨ðŸ‡¿", "DR Congo":"ðŸ‡¨ðŸ‡©", "Ecuador":"ðŸ‡ªðŸ‡¨", "Egypt":"ðŸ‡ªðŸ‡¬",
+      "England":"ðŸ´", "France":"ðŸ‡«ðŸ‡·", "Germany":"ðŸ‡©ðŸ‡ª", "Ghana":"ðŸ‡¬ðŸ‡­", "Haiti":"ðŸ‡­ðŸ‡¹", "Iran":"ðŸ‡®ðŸ‡·",
+      "Iraq":"ðŸ‡®ðŸ‡¶", "Ivory Coast":"ðŸ‡¨ðŸ‡®", "Japan":"ðŸ‡¯ðŸ‡µ", "Jordan":"ðŸ‡¯ðŸ‡´", "Mexico":"ðŸ‡²ðŸ‡½", "Morocco":"ðŸ‡²ðŸ‡¦",
+      "Netherlands":"ðŸ‡³ðŸ‡±", "New Zealand":"ðŸ‡³ðŸ‡¿", "Norway":"ðŸ‡³ðŸ‡´", "Panama":"ðŸ‡µðŸ‡¦", "Paraguay":"ðŸ‡µðŸ‡¾",
+      "Portugal":"ðŸ‡µðŸ‡¹", "Qatar":"ðŸ‡¶ðŸ‡¦", "Saudi Arabia":"ðŸ‡¸ðŸ‡¦", "Scotland":"ðŸ´", "Senegal":"ðŸ‡¸ðŸ‡³",
+      "South Africa":"ðŸ‡¿ðŸ‡¦", "South Korea":"ðŸ‡°ðŸ‡·", "Spain":"ðŸ‡ªðŸ‡¸", "Sweden":"ðŸ‡¸ðŸ‡ª", "Switzerland":"ðŸ‡¨ðŸ‡­",
+      "Tunisia":"ðŸ‡¹ðŸ‡³", "Turkey":"ðŸ‡¹ðŸ‡·", "Uruguay":"ðŸ‡ºðŸ‡¾", "United States":"ðŸ‡ºðŸ‡¸", "Uzbekistan":"ðŸ‡ºðŸ‡¿"
     };
 
     const FLAG_CODES = {
@@ -1641,6 +1674,8 @@
     let selectedId = "g52";
     let latestReport = "";
     let selectedHistoryTeam = "";
+    const PREMIUM_KEY = "COPA2026";
+    const PREMIUM_STORAGE_KEY = "wc2026_premium_access_v1";
 
     const groupFilter = document.getElementById("groupFilter");
     ["Todos","A","B","C","D","E","F","G","H","I","J","K","L","Mata-mata"].forEach(g => {
@@ -1923,9 +1958,7 @@
 
     function renderPlans() {
       const plans = [
-        ["Grátis", "R$ 0", ["Probabilidades básicas", "Tabelas dos grupos", "Últimos jogos por seleção"]],
-        ["Premium Copa", "R$ 19,90/mês", ["Relatórios completos", "Assistente IA", "Simulação de classificação"], true],
-        ["Pro Analista", "R$ 49,90/mês", ["Odds ao vivo quando conectadas", "Alertas de valor", "Exportação de relatórios"]]
+        ["Acesso Premium", "R$ 9,99/mes", ["Probabilidades completas", "Relatorios do jogo", "Assistente IA", "Simulacao de classificacao", "Ultimos jogos por selecao"], true]
       ];
       document.getElementById("planGrid").innerHTML = plans.map(([name, price, items, featured]) => `
         <div class="plan-card ${featured ? "featured" : ""}">
@@ -1933,14 +1966,102 @@
           <div class="insight-title">${name}</div>
           <div class="plan-price">${price}</div>
           <ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>
-          <div class="plan-note">Modelo de assinatura sugerido para transformar a calculadora em produto.</div>
+          <div class="plan-note">Plano unico pensado para uma assinatura simples e acessivel durante a Copa.</div>
+          <div class="premium-form">
+            <input id="premiumKeyInput" type="password" placeholder="Digite sua chave premium">
+            <button class="button primary" id="unlockPremiumBtn" type="button">Liberar</button>
+          </div>
+          <div class="premium-status" id="premiumStatus"></div>
+          <button class="button" id="clearPremiumBtn" type="button">Sair do premium</button>
         </div>
       `).join("");
+      document.getElementById("unlockPremiumBtn").addEventListener("click", unlockPremium);
+      document.getElementById("premiumKeyInput").addEventListener("keydown", event => {
+        if (event.key === "Enter") unlockPremium();
+      });
+      document.getElementById("clearPremiumBtn").addEventListener("click", clearPremium);
+    }
+
+    function hasPremiumAccess() {
+      return localStorage.getItem(PREMIUM_STORAGE_KEY) === "active";
+    }
+
+    function premiumLockMarkup(feature) {
+      return `
+        <div class="locked-panel">
+          <span class="premium-lock">Premium</span>
+          <b>${feature} bloqueado</b>
+          <span>Assine o plano de R$ 9,99 e digite sua chave premium no card de assinatura para liberar este recurso.</span>
+        </div>
+      `;
+    }
+
+    function updatePremiumStatus() {
+      const status = document.getElementById("premiumStatus");
+      const clearButton = document.getElementById("clearPremiumBtn");
+      const input = document.getElementById("premiumKeyInput");
+      const unlockButton = document.getElementById("unlockPremiumBtn");
+      if (!status || !clearButton || !input || !unlockButton) return;
+      if (hasPremiumAccess()) {
+        status.textContent = "Premium ativo neste navegador.";
+        input.value = "";
+        input.disabled = true;
+        unlockButton.disabled = true;
+        clearButton.classList.remove("hidden");
+      } else {
+        status.textContent = "Sem premium ativo. Use a chave enviada apos o pagamento.";
+        input.disabled = false;
+        unlockButton.disabled = false;
+        clearButton.classList.add("hidden");
+      }
+    }
+
+    function unlockPremium() {
+      const input = document.getElementById("premiumKeyInput");
+      const typed = (input?.value || "").trim().toUpperCase();
+      if (typed === PREMIUM_KEY) {
+        localStorage.setItem(PREMIUM_STORAGE_KEY, "active");
+        render();
+        return;
+      }
+      const status = document.getElementById("premiumStatus");
+      if (status) status.textContent = "Chave invalida. Confira o codigo e tente novamente.";
+    }
+
+    function clearPremium() {
+      localStorage.removeItem(PREMIUM_STORAGE_KEY);
+      render();
+    }
+
+    function applyPremiumState() {
+      const premium = hasPremiumAccess();
+      updatePremiumStatus();
+
+      document.getElementById("simulationMeta").textContent = premium ? document.getElementById("simulationMeta").textContent : "Premium";
+      if (!premium) {
+        document.getElementById("qualificationSim").innerHTML = premiumLockMarkup("Simulacao de classificacao");
+        document.getElementById("reportBox").value = "Relatorio premium bloqueado. Assine por R$ 9,99 e use sua chave para liberar.";
+        document.getElementById("chatLog").innerHTML = premiumLockMarkup("Assistente IA");
+        document.getElementById("chatInput").placeholder = "Assistente IA premium bloqueado";
+        document.getElementById("chatInput").disabled = true;
+        document.querySelector("#chatForm button").disabled = true;
+        document.querySelectorAll("[data-prompt]").forEach(button => button.disabled = true);
+      } else {
+        if (document.getElementById("chatLog").textContent.includes("Assistente IA bloqueado")) {
+          document.getElementById("chatLog").innerHTML = `<div class="chat-message ai">Premium ativo. Pode perguntar sobre resultados, pontos, grupos e o jogo selecionado.</div>`;
+        }
+        document.getElementById("chatInput").placeholder = "Pergunte sobre a Copa, grupos ou resultados...";
+        document.getElementById("chatInput").disabled = false;
+        document.querySelector("#chatForm button").disabled = false;
+        document.querySelectorAll("[data-prompt]").forEach(button => button.disabled = false);
+      }
+      document.getElementById("reportBtn").disabled = !premium;
+      document.getElementById("copyBtn").disabled = !premium;
     }
 
     function buildReport(match, calc) {
       if (match.status === "placeholder") {
-        return `RELATÓRIO: ${match.stage}\n\nConfronto ainda a definir.\nData prevista: ${match.date}\n\nA interface já contém o espaço do jogo de mata-mata, mas os times serão preenchidos quando os classificados forem conhecidos.`;
+        return `RELATORIO: ${match.stage}\n\nConfronto ainda a definir.\nData prevista: ${match.date}\n\nA interface já contém o espaço do jogo de mata-mata, mas os times serão preenchidos quando os classificados forem conhecidos.`;
       }
       const home = localName(match.home), away = localName(match.away);
       const s = calc.summary;
@@ -1948,7 +2069,7 @@
       const favorite = s.homeWin > s.awayWin ? home : away;
       const diff = Math.abs(s.homeWin - s.awayWin);
       const scores = calc.topScores.slice(0,5).map(row => `${row.h}-${row.a} (${pct(row.probability)})`).join(", ");
-      return `RELATÓRIO DO JOGO: ${home.toUpperCase()} x ${away.toUpperCase()}
+      return `RELATORIO DO JOGO: ${home.toUpperCase()} x ${away.toUpperCase()}
 
 Data: ${match.date}
 Fase: ${match.stage}
@@ -2055,7 +2176,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       const group = groupMatch?.[1]?.toUpperCase() || (team ? matches.find(m => m.home === team || m.away === team)?.group : current.group);
 
       if (q.includes("assinatura") || q.includes("plano") || q.includes("preço") || q.includes("preco")) {
-        return "Sugestão de produto:\nGrátis: probabilidades básicas, tabelas e últimos jogos.\nPremium Copa: R$ 19,90/mês com relatórios, IA e simulação de classificação.\nPro Analista: R$ 49,90/mês com odds ao vivo quando conectadas, alertas de valor e exportação.";
+        return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
       }
 
       if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {
@@ -2112,7 +2233,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
           `Jogos:\n${games}`;
       }
 
-      return "Posso conversar sobre resultados, tabelas, pontos, grupos e o jogo selecionado. Tente: “quem lidera o grupo C?” ou “resultados do grupo C”.";
+      return "Posso conversar sobre resultados, tabelas, pontos, grupos e o jogo selecionado. Tente: ?quem lidera o grupo C?? ou ?resultados do grupo C?.";
     }
 
     function addChatMessage(role, text) {
@@ -2336,6 +2457,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       renderGroupTables();
       renderQualificationSim();
       renderPlans();
+      applyPremiumState();
     }
 
     document.getElementById("groupFilter").addEventListener("change", () => {
@@ -2350,9 +2472,14 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
     });
     document.getElementById("searchBox").addEventListener("input", renderList);
     document.getElementById("reportBtn").addEventListener("click", () => {
+      if (!hasPremiumAccess()) {
+        document.getElementById("reportBox").value = "Relatorio premium bloqueado. Digite sua chave premium para liberar.";
+        return;
+      }
       document.getElementById("reportBox").value = latestReport;
     });
     document.getElementById("copyBtn").addEventListener("click", async () => {
+      if (!hasPremiumAccess()) return;
       const box = document.getElementById("reportBox");
       try {
         await navigator.clipboard.writeText(box.value);
@@ -2367,12 +2494,17 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       const input = document.getElementById("chatInput");
       const question = input.value.trim();
       if (!question) return;
+      if (!hasPremiumAccess()) {
+        addChatMessage("ai", "Assistente IA bloqueado. Digite sua chave premium para liberar.");
+        return;
+      }
       input.value = "";
       await askAssistant(question);
     });
 
     document.querySelectorAll("[data-prompt]").forEach(button => {
       button.addEventListener("click", () => {
+        if (!hasPremiumAccess()) return;
         askAssistant(button.getAttribute("data-prompt"));
       });
     });
@@ -2420,3 +2552,4 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
   </script>
 </body>
 </html>
+

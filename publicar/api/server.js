@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const cors = require("cors");
 
 const app = express();
@@ -124,70 +124,70 @@ const TEAM_ALIASES = {
   australia: "Australia",
   austria: "Austria",
   belgica: "Belgium",
-  bélgica: "Belgium",
+  "bélgica": "Belgium",
   bosnia: "Bosnia and Herzegovina",
   "bósnia": "Bosnia and Herzegovina",
   brasil: "Brazil",
   canada: "Canada",
-  canadá: "Canada",
+  "canadá": "Canada",
   "cabo verde": "Cape Verde",
   colombia: "Colombia",
-  colômbia: "Colombia",
+  "colômbia": "Colombia",
   croacia: "Croatia",
-  croácia: "Croatia",
-  curacao: "CuraÃ§ao",
-  curaçao: "CuraÃ§ao",
+  "croácia": "Croatia",
+  curacao: "Cura?ao",
+  "curaçao": "Cura?ao",
   tchequia: "Czechia",
-  tchéquia: "Czechia",
+  "tchéquia": "Czechia",
   congo: "DR Congo",
   equador: "Ecuador",
   egito: "Egypt",
   inglaterra: "England",
   franca: "France",
-  frança: "France",
+  "frança": "France",
   alemanha: "Germany",
   gana: "Ghana",
   haiti: "Haiti",
   ira: "Iran",
-  irã: "Iran",
+  "irã": "Iran",
   iraque: "Iraq",
   "costa do marfim": "Ivory Coast",
   japao: "Japan",
-  japão: "Japan",
+  "japão": "Japan",
   jordania: "Jordan",
-  jordânia: "Jordan",
+  "jordânia": "Jordan",
   mexico: "Mexico",
-  méxico: "Mexico",
+  "méxico": "Mexico",
   marrocos: "Morocco",
   holanda: "Netherlands",
   "nova zelandia": "New Zealand",
   "nova zelândia": "New Zealand",
   noruega: "Norway",
   panama: "Panama",
-  panamá: "Panama",
+  "panamá": "Panama",
   paraguai: "Paraguay",
   portugal: "Portugal",
   catar: "Qatar",
   "arabia saudita": "Saudi Arabia",
   "arábia saudita": "Saudi Arabia",
   escocia: "Scotland",
-  escócia: "Scotland",
+  "escócia": "Scotland",
   senegal: "Senegal",
   "africa do sul": "South Africa",
   "áfrica do sul": "South Africa",
   "coreia do sul": "South Korea",
   espanha: "Spain",
   suecia: "Sweden",
-  suécia: "Sweden",
+  "suécia": "Sweden",
   suica: "Switzerland",
-  suíça: "Switzerland",
+  "suíça": "Switzerland",
   tunisia: "Tunisia",
-  tunísia: "Tunisia",
+  "tunísia": "Tunisia",
   turquia: "Turkey",
   uruguai: "Uruguay",
   "estados unidos": "United States",
   uzbequistao: "Uzbekistan",
-  uzbequistão: "Uzbekistan"
+  "uzbequistão": "Uzbekistan"
 };
 
 const LOCAL_NAMES = {
@@ -202,7 +202,7 @@ const LOCAL_NAMES = {
   "Cape Verde": "Cabo Verde",
   Colombia: "Colômbia",
   Croatia: "Croácia",
-  "CuraÃ§ao": "Curaçao",
+  "Cura?ao": "Curaçao",
   Czechia: "Tchéquia",
   "DR Congo": "RD Congo",
   Ecuador: "Equador",
@@ -835,7 +835,7 @@ function answerQuestion(snapshot, question, context = {}) {
   const group = groupMatch?.[1]?.toUpperCase() || teamGroup || "C";
 
   if (q.includes("assinatura") || q.includes("plano") || q.includes("preco") || q.includes("preço")) {
-    return "Sugestão de assinatura:\nGrátis: probabilidades básicas, tabelas e últimos jogos.\nPremium Copa: R$ 19,90/mês com relatórios, IA e simulação de classificação.\nPro Analista: R$ 49,90/mês com odds ao vivo quando conectadas, alertas de valor e exportação.";
+    return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
   }
 
   if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {
@@ -896,7 +896,7 @@ function answerQuestion(snapshot, question, context = {}) {
       `Jogos:\n${games.join("\n")}`;
   }
 
-  return "Posso responder sobre tabela, pontos, resultados e jogos por grupo. Exemplos: “quem lidera o grupo C?”, “resultados do grupo C”, “situação do Brasil” ou “jogos da Escócia”.";
+  return "Posso responder sobre tabela, pontos, resultados e jogos por grupo. Exemplos: ?quem lidera o grupo C??, ?resultados do grupo C?, ?situação do Brasil? ou ?jogos da Escócia?.";
 }
 
 async function fetchText(url) {
@@ -1031,3 +1031,5 @@ app.listen(PORT, () => {
   console.log(`API local rodando em http://localhost:${PORT}`);
   console.log(`Snapshot: http://localhost:${PORT}/api/worldcup/2026/snapshot`);
 });
+
+
