@@ -835,7 +835,7 @@ function answerQuestion(snapshot, question, context = {}) {
   const group = groupMatch?.[1]?.toUpperCase() || teamGroup || "C";
 
   if (q.includes("assinatura") || q.includes("plano") || q.includes("preco") || q.includes("preço")) {
-    return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
+    return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nPagamento via Pix: 15998376372.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
   }
 
   if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {

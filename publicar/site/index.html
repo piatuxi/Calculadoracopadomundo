@@ -1676,6 +1676,7 @@
     let selectedHistoryTeam = "";
     const PREMIUM_KEY = "COPA2026";
     const PREMIUM_STORAGE_KEY = "wc2026_premium_access_v1";
+    const PIX_KEY = "15998376372";
 
     const groupFilter = document.getElementById("groupFilter");
     ["Todos","A","B","C","D","E","F","G","H","I","J","K","L","Mata-mata"].forEach(g => {
@@ -1967,6 +1968,13 @@
           <div class="plan-price">${price}</div>
           <ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>
           <div class="plan-note">Plano unico pensado para uma assinatura simples e acessivel durante a Copa.</div>
+          <div class="locked-panel">
+            <b>Pagamento via Pix</b>
+            <span>Valor: R$ 9,99</span>
+            <span>Chave Pix: <b>${PIX_KEY}</b></span>
+            <button class="button primary" id="copyPixBtn" type="button">Copiar Pix</button>
+            <span class="premium-status">Depois do pagamento, envie o comprovante para receber a chave premium.</span>
+          </div>
           <div class="premium-form">
             <input id="premiumKeyInput" type="password" placeholder="Digite sua chave premium">
             <button class="button primary" id="unlockPremiumBtn" type="button">Liberar</button>
@@ -1975,6 +1983,7 @@
           <button class="button" id="clearPremiumBtn" type="button">Sair do premium</button>
         </div>
       `).join("");
+      document.getElementById("copyPixBtn").addEventListener("click", copyPixKey);
       document.getElementById("unlockPremiumBtn").addEventListener("click", unlockPremium);
       document.getElementById("premiumKeyInput").addEventListener("keydown", event => {
         if (event.key === "Enter") unlockPremium();
@@ -2033,6 +2042,16 @@
       render();
     }
 
+    async function copyPixKey() {
+      const status = document.getElementById("premiumStatus");
+      try {
+        await navigator.clipboard.writeText(PIX_KEY);
+        if (status) status.textContent = "Chave Pix copiada. Depois do pagamento, envie o comprovante para receber a chave premium.";
+      } catch {
+        if (status) status.textContent = `Chave Pix: ${PIX_KEY}`;
+      }
+    }
+
     function applyPremiumState() {
       const premium = hasPremiumAccess();
       updatePremiumStatus();
@@ -2055,7 +2074,7 @@
         document.querySelector("#chatForm button").disabled = false;
         document.querySelectorAll("[data-prompt]").forEach(button => button.disabled = false);
       }
-      document.getElementById("reportBtn").disabled = !premium;
+      document.getElementById("reportBtn").disabled = false;
       document.getElementById("copyBtn").disabled = !premium;
     }
 
@@ -2176,7 +2195,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       const group = groupMatch?.[1]?.toUpperCase() || (team ? matches.find(m => m.home === team || m.away === team)?.group : current.group);
 
       if (q.includes("assinatura") || q.includes("plano") || q.includes("preço") || q.includes("preco")) {
-        return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
+        return `Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nPagamento via Pix: ${PIX_KEY}.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.`;
       }
 
       if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {
@@ -2474,6 +2493,9 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
     document.getElementById("reportBtn").addEventListener("click", () => {
       if (!hasPremiumAccess()) {
         document.getElementById("reportBox").value = "Relatorio premium bloqueado. Digite sua chave premium para liberar.";
+        document.getElementById("planGrid").scrollIntoView({ behavior: "smooth", block: "center" });
+        const status = document.getElementById("premiumStatus");
+        if (status) status.textContent = "Para gerar relatorio, pague R$ 9,99 e digite sua chave premium.";
         return;
       }
       document.getElementById("reportBox").value = latestReport;
