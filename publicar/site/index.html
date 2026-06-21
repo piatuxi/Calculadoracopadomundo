@@ -1395,7 +1395,7 @@
     }
 
     async function fetchLocalApiSnapshot() {
-      const response = await fetch("https://calculadoracopadomundo-1.onrender.com/api/worldcup/2026/snapshot?refresh=1", { cache: "no-store" });
+      const response = await fetch(`${API_BASE}/api/worldcup/2026/snapshot?refresh=1`, { cache: "no-store" });
       if (!response.ok) throw new Error(`API local respondeu ${response.status}`);
       const data = await response.json();
       if (!Array.isArray(data.schedule) || data.schedule.length < 60) {
@@ -1674,6 +1674,7 @@
     let selectedId = "g52";
     let latestReport = "";
     let selectedHistoryTeam = "";
+    const API_BASE = "https://calculadoracopadomundo-1.onrender.com";
     const PREMIUM_KEY = "COPA2026";
     const PREMIUM_STORAGE_KEY = "wc2026_premium_access_v1";
     const PIX_KEY = "15998376372";
@@ -1969,11 +1970,14 @@
           <ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>
           <div class="plan-note">Plano unico pensado para uma assinatura simples e acessivel durante a Copa.</div>
           <div class="locked-panel">
-            <b>Pagamento via Pix</b>
+            <b>Pagamento automatico via Pix</b>
             <span>Valor: R$ 9,99</span>
-            <span>Chave Pix: <b>${PIX_KEY}</b></span>
-            <button class="button primary" id="copyPixBtn" type="button">Copiar Pix</button>
-            <span class="premium-status">Depois do pagamento, envie o comprovante para receber a chave premium.</span>
+            <input id="premiumEmailInput" type="email" placeholder="Seu e-mail para receber a chave">
+            <button class="button primary" id="createPixBtn" type="button">Gerar Pix automatico</button>
+            <div class="premium-status" id="pixStatus">Apos o pagamento aprovado, a chave premium sera enviada para o e-mail informado.</div>
+            <div class="hidden" id="pixResult"></div>
+            <span>Fallback manual: Pix <b>${PIX_KEY}</b></span>
+            <button class="button" id="copyPixBtn" type="button">Copiar Pix manual</button>
           </div>
           <div class="premium-form">
             <input id="premiumKeyInput" type="password" placeholder="Digite sua chave premium">
@@ -1983,6 +1987,7 @@
           <button class="button" id="clearPremiumBtn" type="button">Sair do premium</button>
         </div>
       `).join("");
+      document.getElementById("createPixBtn").addEventListener("click", createAutomaticPix);
       document.getElementById("copyPixBtn").addEventListener("click", copyPixKey);
       document.getElementById("unlockPremiumBtn").addEventListener("click", unlockPremium);
       document.getElementById("premiumKeyInput").addEventListener("keydown", event => {
@@ -2049,6 +2054,45 @@
         if (status) status.textContent = "Chave Pix copiada. Depois do pagamento, envie o comprovante para receber a chave premium.";
       } catch {
         if (status) status.textContent = `Chave Pix: ${PIX_KEY}`;
+      }
+    }
+
+    async function createAutomaticPix() {
+      const email = document.getElementById("premiumEmailInput").value.trim();
+      const status = document.getElementById("pixStatus");
+      const result = document.getElementById("pixResult");
+      if (!email || !email.includes("@")) {
+        status.textContent = "Digite um e-mail valido para receber a chave premium.";
+        return;
+      }
+      status.textContent = "Gerando Pix automatico...";
+      result.classList.add("hidden");
+      result.innerHTML = "";
+      try {
+        const response = await fetch(`${API_BASE}/api/premium/create-pix`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Nao consegui gerar o Pix.");
+        status.textContent = "Pix gerado. Pague pelo app do seu banco; quando aprovado, a chave sera enviada por e-mail.";
+        result.classList.remove("hidden");
+        result.innerHTML = `
+          ${data.qrCodeBase64 ? `<img alt="QR Code Pix" src="data:image/png;base64,${data.qrCodeBase64}" style="max-width:190px;width:100%;border-radius:8px;border:1px solid var(--line);background:white;padding:8px;">` : ""}
+          <textarea class="report-box" style="min-height:90px;font-size:11px;" readonly>${data.copyPaste || ""}</textarea>
+          <button class="button" id="copyAutoPixBtn" type="button">Copiar Pix copia e cola</button>
+        `;
+        document.getElementById("copyAutoPixBtn").addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(data.copyPaste || "");
+            status.textContent = "Pix copia e cola copiado.";
+          } catch {
+            status.textContent = "Copie o codigo Pix manualmente no campo acima.";
+          }
+        });
+      } catch (error) {
+        status.textContent = `${error.message} Use o Pix manual ou configure Mercado Pago/Resend no Render.`;
       }
     }
 
@@ -2195,7 +2239,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       const group = groupMatch?.[1]?.toUpperCase() || (team ? matches.find(m => m.home === team || m.away === team)?.group : current.group);
 
       if (q.includes("assinatura") || q.includes("plano") || q.includes("preço") || q.includes("preco")) {
-        return `Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nPagamento via Pix: ${PIX_KEY}.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.`;
+        return `Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nO usuario informa o e-mail, gera um Pix automatico e, quando o pagamento for aprovado, recebe a chave premium por e-mail.\nTambem existe Pix manual como fallback: ${PIX_KEY}.`;
       }
 
       if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {
@@ -2268,7 +2312,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       addChatMessage("user", question);
       const current = matches.find(m => m.id === selectedId) || matches[0];
       try {
-        const response = await fetch("https://calculadoracopadomundo-1.onrender.com/api/worldcup/2026/ask", {
+        const response = await fetch(`${API_BASE}/api/worldcup/2026/ask`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -2366,7 +2410,7 @@ Observação: é uma estimativa estatística, não garantia de resultado. Notíc
       document.getElementById("teamHistoryList").innerHTML = `<div class="history-empty">Buscando os ultimos 10 jogos pela API local...</div>`;
 
       try {
-        const response = await fetch(`https://calculadoracopadomundo-1.onrender.com/api/worldcup/2026/team/${encodeURIComponent(team)}/results?limit=10`, { cache: "no-store" });
+        const response = await fetch(`${API_BASE}/api/worldcup/2026/team/${encodeURIComponent(team)}/results?limit=10`, { cache: "no-store" });
         if (!response.ok) throw new Error(`API ${response.status}`);
         const data = await response.json();
         renderTeamHistory(data.team || team, data.results || [], data.warning ? "Base local" : "World Football Elo");

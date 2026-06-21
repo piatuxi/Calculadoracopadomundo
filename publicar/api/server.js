@@ -4,6 +4,13 @@ const cors = require("cors");
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const CACHE_MS = Number(process.env.CACHE_MS || 5 * 60 * 1000);
+const PREMIUM_KEY = process.env.PREMIUM_KEY || "COPA2026";
+const PREMIUM_PRICE = Number(process.env.PREMIUM_PRICE || 9.99);
+const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || "";
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Calculadora da Copa <onboarding@resend.dev>";
+const PUBLIC_SITE_URL = process.env.PUBLIC_SITE_URL || "https://calculadora-copa-2026.netlify.app";
+const PUBLIC_API_URL = process.env.PUBLIC_API_URL || "";
 
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
@@ -835,7 +842,7 @@ function answerQuestion(snapshot, question, context = {}) {
   const group = groupMatch?.[1]?.toUpperCase() || teamGroup || "C";
 
   if (q.includes("assinatura") || q.includes("plano") || q.includes("preco") || q.includes("preço")) {
-    return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nPagamento via Pix: 15998376372.\nDepois do pagamento, o usuario recebe uma chave de acesso para liberar os recursos premium neste navegador.\nInclui probabilidades completas, relatorios do jogo, Assistente IA, simulacao de classificacao e ultimos jogos por selecao.";
+    return "Plano unico de assinatura:\nAcesso Premium: R$ 9,99/mes.\nO usuario informa o e-mail, gera um Pix automatico e, quando o pagamento for aprovado, recebe a chave premium por e-mail.\nTambem existe Pix manual como fallback: 15998376372.";
   }
 
   if (q.includes("classifica") || q.includes("classificação") || q.includes("classificacao") || q.includes("top 2") || q.includes("top 3")) {
@@ -924,6 +931,82 @@ async function buildSnapshot() {
   };
 }
 
+function requirePremiumConfig() {
+  if (!MP_ACCESS_TOKEN) {
+    throw new Error("Mercado Pago nao configurado. Defina MP_ACCESS_TOKEN no Render.");
+  }
+  if (!RESEND_API_KEY) {
+    throw new Error("E-mail automatico nao configurado. Defina RESEND_API_KEY no Render.");
+  }
+}
+
+async function createMercadoPagoPix(email) {
+  requirePremiumConfig();
+  const notificationUrl = PUBLIC_API_URL
+    ? `${PUBLIC_API_URL.replace(/\/$/, "")}/api/premium/mercadopago/webhook`
+    : undefined;
+  const response = await fetch("https://api.mercadopago.com/v1/payments", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+      "X-Idempotency-Key": `premium-${email}-${Date.now()}`
+    },
+    body: JSON.stringify({
+      transaction_amount: PREMIUM_PRICE,
+      description: "Acesso Premium - Calculadora da Copa",
+      payment_method_id: "pix",
+      payer: { email },
+      external_reference: `premium:${email}`,
+      ...(notificationUrl ? { notification_url: notificationUrl } : {})
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Falha ao criar Pix no Mercado Pago.");
+  }
+  return data;
+}
+
+async function fetchMercadoPagoPayment(paymentId) {
+  if (!MP_ACCESS_TOKEN) throw new Error("Mercado Pago nao configurado.");
+  const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` }
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Falha ao consultar pagamento.");
+  }
+  return data;
+}
+
+async function sendPremiumEmail(email) {
+  if (!RESEND_API_KEY) throw new Error("Resend nao configurado.");
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: EMAIL_FROM,
+      to: [email],
+      subject: "Sua chave premium - Calculadora da Copa",
+      html: `
+        <p>Pagamento aprovado.</p>
+        <p>Sua chave premium e:</p>
+        <h2>${PREMIUM_KEY}</h2>
+        <p>Acesse ${PUBLIC_SITE_URL}, cole a chave no card Premium e clique em Liberar.</p>
+      `
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Falha ao enviar e-mail premium.");
+  }
+  return data;
+}
+
 app.get("/api/worldcup/2026/snapshot", async (req, res) => {
   const now = Date.now();
   if (cache && now - cacheUpdatedAt < CACHE_MS && req.query.refresh !== "1") {
@@ -966,6 +1049,44 @@ app.post("/api/worldcup/2026/ask", async (req, res) => {
       warning: error.message,
       mode: "fallback"
     });
+  }
+});
+
+app.post("/api/premium/create-pix", async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ error: "E-mail invalido." });
+  }
+
+  try {
+    const payment = await createMercadoPagoPix(email);
+    const point = payment.point_of_interaction?.transaction_data || {};
+    res.json({
+      paymentId: payment.id,
+      status: payment.status,
+      copyPaste: point.qr_code || "",
+      qrCodeBase64: point.qr_code_base64 || "",
+      email
+    });
+  } catch (error) {
+    res.status(501).json({ error: error.message });
+  }
+});
+
+app.post("/api/premium/mercadopago/webhook", async (req, res) => {
+  res.sendStatus(200);
+
+  const paymentId = req.body?.data?.id || req.body?.id || req.query?.id;
+  if (!paymentId) return;
+
+  try {
+    const payment = await fetchMercadoPagoPayment(paymentId);
+    if (payment.status !== "approved") return;
+    const email = payment.payer?.email || String(payment.external_reference || "").replace("premium:", "");
+    if (!email || !email.includes("@")) return;
+    await sendPremiumEmail(email);
+  } catch (error) {
+    console.error("premium webhook error", error.message);
   }
 });
 
